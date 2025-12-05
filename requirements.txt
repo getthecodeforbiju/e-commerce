@@ -1,0 +1,35 @@
+# Core FastAPI
+fastapi==0.115.0
+uvicorn[standard]==0.31.1
+pydantic==2.9.2
+pydantic-settings==2.6.0
+
+# Database
+sqlmodel==0.0.22
+asyncpg==0.29.0
+alembic==1.13.3
+
+# Redis
+redis==5.1.1
+
+# Authentication & Security
+pyjwt==2.9.0
+bcrypt==4.2.0
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.12
+
+# Email
+fastapi-mail==1.4.1
+
+# Background Tasks (we'll add later)
+# celery==5.4.0
+# flower==2.0.1
+
+# Utilities
+python-dateutil==2.9.0
+pillow==10.4.0
+jinja2==3.1.4
+
+# API Documentation
+scalar-fastapi>=1.0.0
+httpx>=0.27.0
