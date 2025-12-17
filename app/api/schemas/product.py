@@ -72,6 +72,8 @@ class ProductResponse(ProductBase):
     seller_id: UUID
     seller: SellerInfo
     category: Optional[CategoryResponse] = None
+    average_rating: Optional[CategoryResponse] = None
+    total_review: int = 0
     created_at: datetime
     updated_at: datetime
 

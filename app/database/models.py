@@ -4,7 +4,7 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlmodel import Field, Relationship, SQLModel, Column, UniqueConstraint
-from sqlalchemy import ARRAY, String, Index
+from sqlalchemy import ARRAY, String, Index, Text
 from sqlalchemy.dialects.postgresql import UUID as PGUUID, TIMESTAMP
 
 
@@ -42,6 +42,7 @@ class User(SQLModel, table=True):
     products: list["Product"] = Relationship(back_populates="seller")
     cart_items: list["CartItem"] = Relationship(back_populates="user")
     orders: list["Order"] = Relationship(back_populates="buyer")
+    reviews: list["Review"] = Relationship(back_populates="user")
 
 
 class Category(SQLModel, table=True):
@@ -90,6 +91,7 @@ class Product(SQLModel, table=True):
     category: Optional[Category] = Relationship(back_populates="products")
     cart_items: list["CartItem"] = Relationship(back_populates="product")
     order_items: list["OrderItem"] = Relationship(back_populates="product")
+    reviews: list["Review"] = Relationship(back_populates="product")
 
 
 class CartItem(SQLModel, table=True):
@@ -181,3 +183,36 @@ class OrderItem(SQLModel, table=True):
     product: Product = Relationship(back_populates="order_items")
     
 
+class Review(SQLModel, table=True):
+    __tablename__= "reviews"
+    
+    __table_args__ = (
+        # One review per user per product
+        UniqueConstraint('user_id', 'product_id', name='unique_user_product_review'),
+        Index('idx_review_product_id','product_id'),
+        Index('idx_review_user_id', 'user_id'),
+        Index('idx_review_rating', 'rating'),
+    )
+    
+    id: UUID = Field(
+        default_factory=uuid4,
+        sa_column=Column(PGUUID(as_uuid=True), primary_key=True)
+    )
+    
+    rating: int = Field(ge=1, le=5, description="Rating from 1 to 5 stars")
+    title: Optional[str] = Field(default=None, max_length=200)
+    comment: Optional[str] = Field(default=None, sa_column=Column(Text))
+    
+    # Verified purchase flag
+    is_verified_purchase: bool = Field(default=False)
+    
+    created_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        sa_column=Column(TIMESTAMP,nullable=False)
+    )
+    
+    user_id: UUID = Field(foreign_key="users.id")
+    product_id: UUID = Field(foreign_key="products.id")
+    
+    user: User = Relationship(back_populates="reviews")
+    product: Product = Relationship(back_populates="reviews")
